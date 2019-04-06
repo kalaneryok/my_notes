@@ -1,0 +1,12 @@
+https://git-scm.com/book/zh/v2
+1.git init 创建本地仓库
+2.git config
+	git config --list  查看
+	git config user.name
+	git config --global user.name "ak"
+	git config --global user.email 18329032039@163.com
+3.别名
+	$ git config --global alias.co checkout
+	$ git config --global alias.br branch
+	$ git config --global alias.ci commit
+	$ git config --global alias.st status
