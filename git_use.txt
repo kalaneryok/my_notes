@@ -10,3 +10,27 @@ https://git-scm.com/book/zh/v2
 	$ git config --global alias.br branch
 	$ git config --global alias.ci commit
 	$ git config --global alias.st status
+5.本地电脑关联github
+	1.创建ssh key
+	ssh-keygen -t rsa -C "18329032039@163.com" 一路回车
+	$ ssh-keygen -t rsa -C "18329032039@163.com"
+	Generating public/private rsa key pair.
+	Enter file in which to save the key (/c/Users/Shinelon/.ssh/id_rsa):
+	Created directory '/c/Users/Shinelon/.ssh'.
+	Enter passphrase (empty for no passphrase):
+	Enter same passphrase again:
+	Your identification has been saved in /c/Users/Shinelon/.ssh/id_rsa.
+	public key has been saved in /c/Users/Shinelon/.ssh/id_rsa.pub.
+	The key fingerprint is:
+	SHA256:7RUUG/TAAvWlc3h37MNv7ZQBRH1uh/V+Dwpm5AZhUWM 18329032039@163.com
+	The key's randomart image is:
+	2.查看内容start ~/.ssh/id_rsa.pub      复制ssk到github创建sshkey
+	3.测试是否连接github成功   假如有出现一堆话 选择yes 再次测试就好了   ssh -T git@github.com
+	4.出现如下样子就OK了
+	$ ssh -T git@github.com
+	Hi kalaneryok! You've successfully authenticated, but GitHub does not provide shell access.
+
+6.查看远程仓库
+	git remote
+	将本地的仓库传送到远程仓库
+	$ git remote add origin xxxxxx
