@@ -1,0 +1,6 @@
+1.虚拟机如何上外网
+
+2.安装git
+	git 查看是否安装
+	没有的话
+	sudo apt-get install git
