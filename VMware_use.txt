@@ -4,3 +4,57 @@
 	git 查看是否安装
 	没有的话
 	sudo apt-get install git
+3.安装gcc
+	1.下载gcc工具包 aarch64-be 表示大端的编译器
+	2.解压
+		xz -d xxx.xz  解压成tar包
+		tar xvf xxx.tar 解压
+		
+		扩展：
+		cvf 打包一个tar
+		xvf 解开
+		cvzf 打包并压缩一个包变成gzip格式文件
+		zxvf 解开压缩的包
+		x : 从 tar 包中把文件提取出来
+		z : 表示 tar 包是被 gzip 压缩过的，所以解压时需要用 gunzip 解压
+		v : 显示详细信息
+		f xxx.tar.gz : 指定被处理的文件是 xxx.tar.gz
+		
+		
+		xz压缩文件方法或命令
+		xz -z 要压缩的文件
+
+		如果要保留被压缩的文件加上参数 -k ，如果要设置压缩率加入参数 -0 到 -9调节压缩率。如果不设置，默认压缩等级是6.
+
+		xz解压文件方法或命令
+		xz -d 要解压的文件
+
+		同样使用 -k 参数来保留被解压缩的文件。
+
+		创建或解压tar.xz文件的方法
+		习惯了 tar czvf 或 tar xzvf 的人可能碰到 tar.xz也会想用单一命令搞定解压或压缩。其实不行 tar里面没有征对xz格式的参数比如 z是针对 gzip，j是针对 bzip2。
+
+		创建tar.xz文件：只要先 tar cvf xxx.tar xxx/ 这样创建xxx.tar文件先，然后使用 xz -z xxx.tar 来将 xxx.tar压缩成为 xxx.tar.xz
+
+		解压tar.xz文件：先 xz -d xxx.tar.xz 将 xxx.tar.xz解压成 xxx.tar 然后，再用 tar xvf xxx.tar来解包。
+	3.vim添加环境变量
+		G到文档尾
+		a在光标后添加
+		x删除光标位置的字符
+		hjkl左上右下
+		export PATH=/要添加的路径:$PATH
+	4.假如添加好环境变量后执行不行显示 No such file or directory
+		32位和64位机不兼容问题安装以下软件
+		sudo apt-get install lib32z1
+	
+		sudo apt-get install lib32ncurses5
+
+		sudo apt-get install lib32bz2-1.0
+		提示libstdc++没有再安装
+		sudo apt-get install libstdc++6
+		sudo apt-get install lib32stdc++6
+		运行aarchxxx  -v
+4.下载uboot的git代码编译uboot需要gcc6.0以上版本
+	1.编译发现swig没有，安装 sudo apt-get install swig
+	2.在编译发现Python.h没找到安装sudo apt-get install python-dev
+	3.在编译
