@@ -57,4 +57,4 @@
 4.下载uboot的git代码编译uboot需要gcc6.0以上版本
 	1.编译发现swig没有，安装 sudo apt-get install swig
 	2.在编译发现Python.h没找到安装sudo apt-get install python-dev
-	3.在编译
+	3.在编译缺少dtc工具

@@ -1,0 +1,12 @@
+1.下载uboot的git代码编译uboot需要gcc6.0以上版本
+	1.编译发现swig没有，安装 sudo apt-get install swig
+	2.在编译发现Python.h没找到安装sudo apt-get install python-dev
+	3.在编译缺少dtc工具 安装dtc  sudo apt-get install device-tree-compiler
+2.下载安装sunxitool工具
+	1.安装usb库
+		sudo apt-get install libusb-1.0-0-dev
+	2.下载sunxi-tool源码
+		git clone https://github.com/linux-sunxi/sunxi-tools
+	3.编译详情可以看github上面的readme
+		make tools
+		sudo make install-tools 安装到/usr/local/bin目录下
