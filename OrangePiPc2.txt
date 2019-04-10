@@ -5,8 +5,22 @@
 2.下载安装sunxitool工具
 	1.安装usb库
 		sudo apt-get install libusb-1.0-0-dev
-	2.下载sunxi-tool源码
+	2.下载sunxi-tool源码或者网网盘下载
 		git clone https://github.com/linux-sunxi/sunxi-tools
 	3.编译详情可以看github上面的readme
 		make tools
 		sudo make install-tools 安装到/usr/local/bin目录下
+		
+		
+		
+		
+		
+		
+kernel
+	1.下载源码
+	2.make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
+	/bin/sh: 1: bison: not found，，安装 sudo apt-get install bison
+	/bin/sh: 1: flex: not found       sudo apt-get install flex
+	3.make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- dtbs
+	dtb文件在arch/arm64/boot/dts/相关平台的目录下
+	Image则在arm64/boot下
