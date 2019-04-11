@@ -58,3 +58,27 @@
 	1.编译发现swig没有，安装 sudo apt-get install swig
 	2.在编译发现Python.h没找到安装sudo apt-get install python-dev
 	3.在编译缺少dtc工具
+5.安装samba
+	1.安装samba服务器。 
+	sudo apt-get install samba samba-common
+	2.添加用户(下面的AK_VMLinux是我的用户名，之后会需要设置samba的密码)。 
+	sudo smbpasswd -a AK_VMLinux
+	输入samba密码
+	3.sudo vim /etc/samba/smb.conf
+	#ak seting
+	[AKhome]
+	comment = share folder
+	browseable = yes
+	path = /home/ak/zhizuo/
+	create mask = 0700
+	directory mask = 0700
+	#valid users = AK_VMLinux
+	#force user = AK_VMLinux
+	#force group = AK_VMLinux
+	public = yes
+	available = yes
+	writable = yes
+	#ak seting
+	4.重启samba服务器
+	sudo service smbd restart
+	5.在windos访问vmlinux的ip输入samba用户和密码，就能看到/home/ak/zhizuo/下的东西了
