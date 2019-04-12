@@ -24,3 +24,14 @@ kernel
 	3.make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- dtbs
 	dtb文件在arch/arm64/boot/dts/相关平台的目录下
 	Image则在arm64/boot下
+
+	
+在uboot下
+1.设置serverip  iddr
+	setenv ipaddr 192.168.5.120
+	setenv serverip 192.168.5.16
+2.tftp uimage 和dtbs
+	tftp 40080000 Image
+	tftp 4FA00000 sun50i-h5-orangepi-pc2.dtb
+	booti 40080000 - 4fa00000
+3.挂载rootfs内核就起来了
