@@ -35,3 +35,71 @@ kernel
 	tftp 4FA00000 sun50i-h5-orangepi-pc2.dtb
 	booti 40080000 - 4fa00000
 3.挂载rootfs内核就起来了
+4.挂载nfs文件系统
+	https://blog.csdn.net/thisway_diy/article/details/68067350
+	https://blog.csdn.net/qq695104815/article/details/79050780
+	https://www.cnblogs.com/Jasonsblog/p/3778485.html
+	1.在linux下安装nfs服务器
+	先下载NFS服务器，演示如下： 
+	sudo apt-get install nfs-kernel-server 
+	2.创建nfs目录注意修改权限777
+	3.修改配置文件
+
+	NFS服务的配置文件路径：/etc/exports,刚安装完的配置文件只有一些说明。
+
+	#sudo vi /etc/exports
+	在里面加入
+
+	/nfsboot *(rw,sync,no_root_squash)
+	说明：
+
+	/nfsboot是要共享的目录
+
+	*代表允许所有的网络段访问，为安全起见，可指定网络号段，如202.38.214*，注意：*与（之间不能有空格，否则开发板挂载之后将只有读权限而没有写权限。
+
+	rw是可读写权限
+
+	sync是资料同步写入内存和硬盘
+
+	no_root_squash是NFS客户端分享目录使用者的权限，
+	如果客户端使用的是root用户，那么对于该共享目录而言，该客户端就具有root权限
+	4.重启服务
+
+	使用以下命令重启服务
+
+	#sudo /etc/init.d/nfs-kernel-server restart
+	5.测试服务器
+
+	查看服务器目录和权限
+
+	#showmount -e
+	6.本地挂载测试
+		使用mount   
+		mount [-t vfstype] [-o options] device dir 
+		mount 的用法，-t表示挂载文件系统 nfs表示挂载nfs文件系统
+		sudo mount -t nfs 192.168.100.128:/home/ak/zhizuo/nfsDir/rootfs ~/zhizuo/my_GitWork/temp/aaa/
+		即把分享的目录挂载到了 aaa目录下
+		可以使用df 查看
+		不用时umount掉aaa即可
+
+		
+5.开发板与宿主机通过NFS连接，有时候会会出现下列问题:connection refused
+
+ nfs mount 默认选项包括文件锁，依赖于portmap提供的动态端口分配功能。
+        解决方法：kill 文件锁（lockd）或者mount -o nolock
+
+        于是尝试mount -o nolock -t nfs 192.168.43.143:/home/yuming/nfs/rootfs /mnt，正常工作。
+--------------------- 
+作者：念念有余 
+来源：CSDN 
+原文：https://blog.csdn.net/u012142460/article/details/78832355 
+版权声明：本文为博主原创文章，转载请附上博文链接！
+	
+	
+	
+	
+	
+	
+	
+	
+	

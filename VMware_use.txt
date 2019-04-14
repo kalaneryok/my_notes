@@ -82,3 +82,60 @@
 	4.重启samba服务器
 	sudo service smbd restart
 	5.在windos访问vmlinux的ip输入samba用户和密码，就能看到/home/ak/zhizuo/下的东西了
+6.虚拟机三种网络模式的介绍
+	https://blog.csdn.net/little_newBee/article/details/76861723
+	https://blog.csdn.net/henujyj/article/details/80019226
+	之前由于网络环境会变主机的IP网段不一，虚拟机想要连上主机又得配虚拟机ip，配完主要工程会丢失
+	uboot ipaddr和serverip又得重新配置
+	现在想要弄一种不管主机如何变化虚拟机IP不变也能上网
+	1.主机模式：主机和虚拟机可以不同网段但是ip是默认的不能自己分配ip且ip不定时会变，自己修改ip将无法上网
+	2.桥接，相当于一台hub，主机和虚拟机必须配置一样同一网段才能通信
+	3.net：有vm8网卡分配ip、网关、dns、可以设置自己的ip
+	4.虚拟机-》设置里面可以看当前虚拟机的网络模式
+	5.
+	发现有块VMware Network 
+	本篇文章来源于 Linux公社网站(www.linuxidc.com)  原文链接：https://www.linuxidc.com/Linux/2017-09/147080.htm
+	6.原理分析：
+
+		1.首先明白VMware软件提供的功能：NAT ，网关，dhcp，dns等功能。
+
+		把vmare想象成模拟成了NAT设备，网关设备，交换机，dhcp设备，dns等多台设备，将真机和虚拟机组网起来，实现相互通信，虚拟机上网的功能。
+
+		明白VMware Network Adapter VMnet8的作用
+
+		我们在真机中发现有块VMware Network Adapter VMnet8的网卡，在NAT网络中，会使用到VMnet8交换机，真实主机上的VMware Network Adapter VMnet8连接到VMnet8交换机，来与虚拟机通信。所以VMware Network Adapter VMnet8仅仅是和Vmnet8虚拟机交换机网络通信的（192.168.128.0/24），并不提供路由功能。禁用掉VMware Network Adapter VMnet8网卡，虚拟机仍然能上网，只是真机与虚拟机之间不能通信。
+
+		2.明白NAT设备作用
+
+		NAT设备有两块网卡，一个是真机的物理网卡192.168.31.22，另一个是虚拟网卡192.168.128.2
+
+		NAT会对源ip进行转换，也为目的ip进行转换，会创建如图所示的NAT表。
+
+		3.虚拟机上外网：
+
+		流量到达网关192.168.128.2，NAT设备将目的IP修改为真机物理网卡IP 192.168.31.22，物理网卡再通过路由器上外网。
+
+		4..虚拟机访问真机，即192.168.128.204访问192.168.31.22：
+
+		虚拟机将流量转发至网关192.168.128.2，检测NAT表，将目的IP192.168.31.22映射为192.168.128.1，因此真机虚拟网卡192.168.128.1（VMware Network Adapter VMnet8）接收到流量。
+
+		抓包显示VMware Network Adapter VMnet8收到流量，真机物理网卡并无流量。
+		结论：真机与虚拟机互访通过VMware提供的VMware Network Adapter VMnet8网卡通信
+		本篇文章来源于 Linux公社网站(www.linuxidc.com)  原文链接：https://www.linuxidc.com/Linux/2017-09/147080.htm
+	7.我的设置
+		1.首先将虚拟机设置成net模式
+		2.设置固定ip原来的是192.168.160.130
+			打算将虚拟机的ip设置成固定的192.168.100.100
+			我的开发板的ip设置成固定的  192.168.100.16
+			那么就要设置vm8网卡的ip到windos下设置ip192.168.100.1
+		3.到虚拟机下设置编辑-》虚拟网络编辑器
+			1.子网ip设置192.168.100.0
+			2.net设置网关192.168.100.2
+		4.网卡down后再up后就发现网段已经到100了
+		5.现在是可以了，Windows可以smaba到虚拟机，也可以ping 通虚拟机
+		但是虚拟机修改他自己的分配的ip后，主机可以ping通虚拟机，但虚拟机ping不通主机，也不能上网
+		他自己分配的ip可以，和主机互相ping通，也可以正常上网。
+		
+		
+		
+		
