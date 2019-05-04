@@ -13,11 +13,8 @@
 		
 		
 		
-		
-		
-		
 kernel
-	1.下载源码
+	1.下载源码  解压  tar -xzf linux.tar.gz
 	2.make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
 	/bin/sh: 1: bison: not found，，安装 sudo apt-get install bison
 	/bin/sh: 1: flex: not found       sudo apt-get install flex
@@ -78,6 +75,7 @@ kernel
 		mount [-t vfstype] [-o options] device dir 
 		mount 的用法，-t表示挂载文件系统 nfs表示挂载nfs文件系统
 		sudo mount -t nfs 192.168.100.128:/home/ak/zhizuo/nfsDir/rootfs ~/zhizuo/my_GitWork/temp/aaa/
+		                  localhost：也可以
 		即把分享的目录挂载到了 aaa目录下
 		可以使用df 查看
 		不用时umount掉aaa即可
@@ -95,11 +93,79 @@ kernel
 原文：https://blog.csdn.net/u012142460/article/details/78832355 
 版权声明：本文为博主原创文章，转载请附上博文链接！
 	
+6.开发板电脑虚拟机三者ping通必须使用桥接模式切只能设置在同一网段
+	1.设置虚拟机-》设置-》桥接模式
+	2.编辑-》虚拟网络编辑器-》设置桥接到那个网卡
+	3.手动设置虚拟机的网络ip网关。
+	4.测试
 	
-	
-	
-	
-	
-	
-	
-	
+rootfs
+	1.去官网下载最新busybox    https://busybox.net/
+	2.解压tar -xjf busybox-1.30.1.tar.bz2
+	修改Makefile，找到 （此处需修改Makefile）
+	ARCH ？= $(SUBARCH)
+	CROSS_COMPILE ?= 
+		 改为：
+	ARCH ？= arm （后面不能有空格）
+	CROSS_COMPILE ?= arm-linux-
+	3.解压后make defconfig
+	4.make menuconfig  会出错curses.h找不到 安装sudo apt-get install libncurses5-dev
+	5.make CROSS_COMPILE=aarch64-linux-gnu-    make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-   指定编译器编译
+	6.make install 生成_install目录
+	7.将_install目录下的文件全部拷贝到nfs服务器下顺便在创建其他目录和文件
+		cp ./* rootfs/ -ra
+		切记一定要带上-a的参数，因为bin目录里大部分都是链接，如果不带-a的参数，拷过去之后会做相应的复制，不再是链接的形式
+	8.
+	mkdir  dev etc lib mnt opt proc  srv sys tmp  var
+	cd etc 
+	mkdir init.d network
+	cd network
+	touch if-down.d if-post-down.d if-pre-up.d if-up.d
+	cd ../var
+	mkdir run
+	cd ../
+	9.以上制作方式挂载不上nfs文件系统后来发现内核没有配置网卡驱动
+	10.复制uboot下的网卡驱动文件到	drivers/net/ethernet/allwinner/ 及修改该目录下的Makefile将驱动编译进内核
+		config文件
+			CONFIG_ETHERNET=y
+			CONFIG_NET_VENDOR_ALLWINNER=y
+			#CONFIG_SUN4I_EMAC=y
+			CONFIG_SUN8I_EMAC=y
+	11.上述修改后还是挂载不上，现在计划使用initramfs来确定网卡驱动是否可以用了
+initranfs
+	1.自行编写init程序验证
+	2.编写init.c
+	#include< stdio.h>
+
+	int main(void) 
+	{ 
+			char ch; 
+
+			printf("Test /sbin/init main....\n"); 
+			printf("0123456789abcdefghijklmnopqrstuvwxyz\n"); 
+			printf("ABCDEFGHIJKLMNOPQRSTUVWXYZ9876543210\n"); 
+
+			while ((ch = getchar()) != 'q') 
+					printf("%c", ch); 
+
+			return 0; 
+	}
+	3.编译 aarch64-linux-gnu-gcc -static -o init init.c
+	4.打包成initranfs格式
+		1.新建一个rootfs目录 记住这个目录的地址initramfs——dir
+		2.将编译好的init 放到上面地址的sbin目录下
+		3.进到initranfs目录下执行打包命令
+			find . | cpio -H newc -o | gzip -9 > ./initramfs.cpio.gz
+
+		4.在内核中将这个包文件包含进去
+			1.配置内核
+				1.确保general setup 中选中了init ram filsystem
+				2.指定包文件的路径initramfs source file 就填上面的路径
+				3.假如找不到也可以在config文件中指定
+				这个kconfig在user目录下的
+				CONFIG_INITRAMFS_SOURCE="/home/ak/zhizuo/nfsDir/initranfs/rootfs/initramfs.cpio.gz"
+			2.device driver 设置
+				1.block devices-> 染blockdevicesupport
+				2.或者CONFIG_BLK_DEV_RAM=y
+		5.估计需要配置ram0的地址在设备树文件中设置可能是
+				
