@@ -22,7 +22,8 @@
 	TFTP_ADDRESS="127.0.0.1"  这个IP地址先试用localhost测试后续真实的修改成真实的网卡地址
 	TFTP_OPTIONS="-l -c -s"  这个要修改成这样
 
-	要把tftp目录权限设置成777不然可能会出现不能上传的问题
+	
+	
 	3. sudo service tftpd-hpa restart
 	4. netstat -au | grep tftp            查看服务是否已经启动 
 	如果显示udp        0      0 *:tftp                  *:*，说明你的tftp服务已经启动
@@ -31,7 +32,9 @@
 	测试：
 		因为已经下载了客户端所以可以在本机测试
 		1.tftp localhost  put aaa    get aaa  上传和下载 q退出
-		
+		要把tftp目录权限设置成777不然可能会出现不能上传的问题 里面的文件也是
+		在uboot下设置的serverip一定要是虚拟机下的eth0的ip，也要和ftp配置文件下一致，不能是电脑网卡的ip不然会去电脑上去找tftp服务器
+		电脑物理网卡的ip要和虚拟机下的eth0的ip不一样才能正确找到虚拟机上的ip tftp服务器。
 kernel
 	1.下载源码  解压  tar -xzf linux.tar.gz
 	2.make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
