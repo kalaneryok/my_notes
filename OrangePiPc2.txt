@@ -11,20 +11,26 @@
 		make tools
 		sudo make install-tools 安装到/usr/local/bin目录下
 3.安装tftp服务器
-	1.有没有sudo dpkg -l tftpd-hpa)
+	1.有没有sudo dpkg -l tftpd-hpa)    tftp-hpa,tftpd-hpa,前面的是客户端，后面的是服务程序
 	2.安装 
 	sudo apt-get install tftp-hpa
+	sudo apt-get install tftpd-hpa
 	2.配置服务文件 
 	vi /etc/default/tftp-hpa
-	#Defaults for tftpd-hpa
-	RUN_DAEMON="yes"                          此处将no改成yes，以启动tftp服务
-	OPTIONS="-l -s /var/lib/tftpboot"   此处设置服务器目录，共享文件
-	3. reboot                                            要使服务启动，需重启linux
+	TFTP_USERNAME="tftp"
+	TFTP_DIRECTORY="/home/ak/zhizuo/tftpboot"
+	TFTP_ADDRESS="127.0.0.1"  这个IP地址先试用localhost测试后续真实的修改成真实的网卡地址
+	TFTP_OPTIONS="-l -c -s"  这个要修改成这样
+
+	要把tftp目录权限设置成777不然可能会出现不能上传的问题
+	3. sudo service tftpd-hpa restart
 	4. netstat -au | grep tftp            查看服务是否已经启动 
 	如果显示udp        0      0 *:tftp                  *:*，说明你的tftp服务已经启动
 	5. 然后你可以把需要下载到开发板的文件，拷贝到/var/lib/tftpboot
-	6.记得使用桥接模式才能下在
-		
+	6.记得使用桥接模式才能下载假如是在开发板上的话
+	测试：
+		因为已经下载了客户端所以可以在本机测试
+		1.tftp localhost  put aaa    get aaa  上传和下载 q退出
 		
 kernel
 	1.下载源码  解压  tar -xzf linux.tar.gz
