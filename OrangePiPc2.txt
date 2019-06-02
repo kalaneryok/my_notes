@@ -10,7 +10,20 @@
 	3.编译详情可以看github上面的readme
 		make tools
 		sudo make install-tools 安装到/usr/local/bin目录下
-		
+3.安装tftp服务器
+	1.有没有sudo dpkg -l tftpd-hpa)
+	2.安装 
+	sudo apt-get install tftp-hpa
+	2.配置服务文件 
+	vi /etc/default/tftp-hpa
+	#Defaults for tftpd-hpa
+	RUN_DAEMON="yes"                          此处将no改成yes，以启动tftp服务
+	OPTIONS="-l -s /var/lib/tftpboot"   此处设置服务器目录，共享文件
+	3. reboot                                            要使服务启动，需重启linux
+	4. netstat -au | grep tftp            查看服务是否已经启动 
+	如果显示udp        0      0 *:tftp                  *:*，说明你的tftp服务已经启动
+	5. 然后你可以把需要下载到开发板的文件，拷贝到/var/lib/tftpboot
+	6.记得使用桥接模式才能下在
 		
 		
 kernel
@@ -79,6 +92,7 @@ kernel
 		即把分享的目录挂载到了 aaa目录下
 		可以使用df 查看
 		不用时umount掉aaa即可
+	
 
 		
 5.开发板与宿主机通过NFS连接，有时候会会出现下列问题:connection refused
@@ -98,7 +112,16 @@ kernel
 	2.编辑-》虚拟网络编辑器-》设置桥接到那个网卡
 	3.手动设置虚拟机的网络ip网关。
 	4.测试
-	
+	比如，我电脑wifiip 192.168.5.111，那么我的电脑网口就要设值成192.168.5.16，我虚拟机必须使用桥接，将vm0桥接到我
+	真实的物理网卡上去，再将我的开发板设置为192.168.5.120
+
+7.使用initramfs可以先让系统起来挂载nfs看能不能挂载上，但是需要参数不然挂载不上
+	mount -t nfs -o nolock 192.168.5.111:/home/ak/zhizuo/nfsDir/rootfs /mnt/
+	1.这个问题
+		IP-Config: Cannot add default route (-101).
+		虚拟机的网关和设备的网关设置没有一致导致的。
+	修改uboot的bootarg还是不能直接挂载成功
+	setenv bootargs "root=/dev/nfs nfsroot=192.168.5.111:/home/ak/zhizuo/nfsDir/rootfs ip=192.168.5.120:192.168.5.111:192.168.5.1:255.255.255.0::eth0:off init=/linuxrc"
 rootfs
 	1.去官网下载最新busybox    https://busybox.net/
 	2.解压tar -xjf busybox-1.30.1.tar.bz2
@@ -115,15 +138,124 @@ rootfs
 	7.将_install目录下的文件全部拷贝到nfs服务器下顺便在创建其他目录和文件
 		cp ./* rootfs/ -ra
 		切记一定要带上-a的参数，因为bin目录里大部分都是链接，如果不带-a的参数，拷过去之后会做相应的复制，不再是链接的形式
-	8.
-	mkdir  dev etc lib mnt opt proc  srv sys tmp  var
-	cd etc 
-	mkdir init.d network
-	cd network
-	touch if-down.d if-post-down.d if-pre-up.d if-up.d
-	cd ../var
-	mkdir run
-	cd ../
+	8.创建必须目录
+		1.mkdir  dev etc lib mnt opt proc  srv sys tmp  var
+		必须创建这连个东西，不让没输出 dev目录下创建
+		sudo mknod console c 5 1    //创建console字符设备,
+
+		sudo mknod null c 1 3    //创建null 字符设备,
+		2.  拷贝Busybox-1.16.1/examples/bootfloopy/etc/* 到当前目录下
+        #cp –r busybox-1.16.1/examples/bootfloopy/etc/*  rootfs/etc
+		3.修改inittab，
+
+                原始文件为：
+
+　　　　　　　　1 ::sysinit:/etc/init.d/rcS
+　　　　　　　　2 ::respawn:-/bin/sh
+　　　　　　　　3 tty2::askfirst:-/bin/sh
+　　　　　　　　4 ::ctrlaltdel:/bin/umount -a -r
+
+　　　　　　修改后为：
+
+        ---（1）：开机免登陆，直接打开shell（前面数字为行号）　　　　　　　　 
+
+　　　　　　　　1 ::sysinit:/etc/init.d/rcS
+　　　　　　　　2 #::respawn:-/bin/sh
+　　　　　　　　3 #::respawn:-/bin/login
+　　　　　　　　4 console::askfirst:-/bin/sh
+　　　　　　　　5 #tty2::askfirst:-/bin/sh
+　　　　　　　　6 ::ctrlaltdel:/bin/umount -a -r
+
+        ---（2）：开机需要登陆（前面数字为行号）　　　　　　　　 
+
+　　　　　　　　1 ::sysinit:/etc/init.d/rcS
+　　　　　　　　2 #::respawn:-/bin/sh
+　　　　　　　　3 ::respawn:-/bin/login
+　　　　　　　　4 #console::askfirst:-/bin/sh
+　　　　　　　　5 #tty2::askfirst:-/bin/sh
+　　　　　　　　6 ::ctrlaltdel:/bin/umount -a -r
+		4.这个可以不用密码登入不改
+			2)拷贝虚拟机上的/etc/passwd, /etc/group, /etc/shadow到rootfs/etc下
+
+ 
+
+        # cp /etc/passwd   rootfs/etc
+        # cp /etc/group    rootfs/etc 
+        # cp /etc/shadow   roofs/etc
+
+ 
+
+	　　对以下三个文件修改，只保存与root相关的项，根据具体情况内容会有所不同。
+
+	　　修改passwd为root:x:0:0:root:/root:/bin/sh，即只保存与root相关项，而且最后改成/bin/ash。
+
+	　　修改group为root:x:0:root
+
+	　　修改shadow为root:$1$x9yv1WlB$abJ2v9jOlOc9xW/y0QwPs.:14034:0:99999:7:::
+
+	　　登陆开发板时需输入用户名密码，同虚拟机相同
+		5.4.安装glibc库  去你那个编译的工具安装目录下的lib目录下拷贝库，这个很重要没有起不来
+
+		mkdir lib              //在mini_fs目录下创建个lib目录 (存放库函数)
+
+		cd /work/tools/gcc-3.4.5-glibc-2.3.6/arm-linux/lib     //进入源目录
+
+		cp *.so* /work/nfs_root/mini_fs/lib -d        //复制glibc库到lib目录(*:匹配符,-d:保持链接)
+		6.3）修改profile
+			#可执行程序 环境变量
+		　　PATH=/bin:/sbin:/usr/bin:/usr/sbin          
+			#动态链接库 环境变量
+		　　export LD_LIBRARY_PATH=/lib:/usr/lib        
+		　　/bin/hostname AK-PIPC2    主机名
+		　　USER="`id -un`"
+		　　LOGNAME=$USER
+		　　HOSTNAME='/bin/hostname'
+		　　PS1='\u@\H:[\w]\n\$ '
+                          
+
+			4)修改 etc/init.d/rc.S文件 （不影响启动）
+
+		　　/bin/mount -n -t ramfs ramfs /var
+
+		　　/bin/mount -n -t ramfs ramfs /tmp
+
+		　　/bin/mount -n -t sysfs none /sys
+
+		　　/bin/mount -n -t ramfs none /dev
+
+		　　/bin/mkdir /var/tmp
+
+		　　/bin/mkdir /var/modules
+
+		　　/bin/mkdir /var/run
+
+		　　/bin/mkdir /var/log
+
+		　　/bin/mkdir -p /dev/pts                    //telnet服务需要
+
+		　　/bin/mkdir -p /dev/shm                    //telnet服务需要
+
+		　　#echo /sbin/mdev > /proc/sys/kernel/hotplug//USB自动挂载需要
+
+		　　/sbin/mdev -s         //启动mdev在/dev下自动创建设备文件节点
+
+		　　/bin/mount -a
+
+		　　 #######配置网络################################
+
+		　　 /sbin/ifconfig lo 127.0.0.1 netmask 255.0.0.0
+
+		　　/sbin/ifconfig eth0 192.168.1.70
+		　　/sbin/ifconfig eth0 netmask 255.255.255.0
+		　　/sbin/route add default gw 192.168.1.1 eth0
+
+		　　/sbin/ifconfig eth1 192.168.1.71 netmask 255.255.255.0
+		　　/sbin/route add default gw 192.168.1.1 eth1
+	
+			5.5)修改etc/fstab文件，增加以下文件 （不影响启动）
+
+			none   /dev/pts    devpts   mode=0622      0 0
+			tmpfs  /dev/shm    tmpfs    defaults       0 0
 	9.以上制作方式挂载不上nfs文件系统后来发现内核没有配置网卡驱动
 	10.复制uboot下的网卡驱动文件到	drivers/net/ethernet/allwinner/ 及修改该目录下的Makefile将驱动编译进内核
 		config文件
@@ -153,7 +285,7 @@ initranfs
 	3.编译 aarch64-linux-gnu-gcc -static -o init init.c
 	4.打包成initranfs格式
 		1.新建一个rootfs目录 记住这个目录的地址initramfs——dir
-		2.将编译好的init 放到上面地址的sbin目录下
+		2.将编译好的init 放到上面地址的目录下  这个目录下同时必须要有dev目录和console不然没打印输出
 		3.进到initranfs目录下执行打包命令
 			find . | cpio -H newc -o | gzip -9 > ./initramfs.cpio.gz
 
@@ -167,5 +299,11 @@ initranfs
 			2.device driver 设置
 				1.block devices-> 染blockdevicesupport
 				2.或者CONFIG_BLK_DEV_RAM=y
-		5.估计需要配置ram0的地址在设备树文件中设置可能是
+		5.在uboot下设置	
+			1.tftp 4FA00000 sun50i-h5-orangepi-pc2.dtb
+			2.tftp 40080000 Image
+			3.setenv bootargs "root=/dev/ram0 rdinit=/init"    initramfs一定要用rdinit
+			4.booti 40080000 - 4fa00000
+			后面就发现之前编译的init程序就起来了
+		6.同样用上面步骤busybox创建的根文件系统打包后，uboot输入参数为rdinit=/linuxrc就行了
 				
