@@ -43,3 +43,13 @@ https://git-scm.com/book/zh/v2
 		
 7.克隆远程仓库
 		git clone git@github.com:kalaneryok/myOrgPiPc2Pro_uboot.git
+
+8.将本地的文件存到github上
+	在git上创建仓库不要勾选init
+	2.git上会有操作步骤
+	echo "# project" >> README.md
+	git init
+	git add README.md
+	git commit -m "first commit"
+	git remote add origin git@github.com:kalaneryok/project.git
+	git push -u origin master

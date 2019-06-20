@@ -102,7 +102,8 @@ kernel
 		可以使用df 查看
 		不用时umount掉aaa即可
 	
-
+	7.此外还得看nfs服务器的版本和kernel挂载的版本是否支持，内核默认用2版本
+		nfsstat -s 查看nfs服务器的运行版本
 		
 5.开发板与宿主机通过NFS连接，有时候会会出现下列问题:connection refused
 
