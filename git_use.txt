@@ -53,3 +53,93 @@ https://git-scm.com/book/zh/v2
 	git commit -m "first commit"
 	git remote add origin git@github.com:kalaneryok/project.git
 	git push -u origin master
+9.reset撤销
+	git status 先看一下add 中的文件 
+	git reset HEAD 如果后面什么都不跟的话 就是上一次add 里面的全部撤销了 
+	git reset HEAD XXX/XXX/XXX.java 就是对某个文件进行撤销了
+10基本使用操作---------------------------------------------------------
+1.查看修改历史
+	git log --oneline  显示一栏
+	git log --name-only 显示每次修改的文件列表
+	git log --name-status 显示每次修改的文件列表及修改文件的状态M A D
+2.查看文件不同之处
+	git diff --cached   xxx   比较缓存区和本地版本库的差异
+	git diff head    xxx   比较工作区和本地最新版本库的差异
+	git diff commit-id xxx  比较工作区和指定commitid的差异
+	git diff commit-id commit-id  比较两次提交的差异
+3.添加全局仓库忽略文件
+	创建文件.gitignore
+	*.[oa] //忽略.o  .a文件
+	！my.a //除了my.a不忽略
+	dbg    //忽略dbg文件和目录
+	！dgb/ //除了目录不忽略（两条一起用）
+	/dbg   //只忽略当前dbg目录，子目录中的dbg目录不忽略
+	当向创建一个文件但是这个文件被你之前忽略掉了导致添加不上但你有不知道
+	可以检查下aaa.txt 文件
+	git check-ignore -v aaa.txt
+4.删除某个文件的版本控制  当我们需要删除暂存区或分支上的文件, 但本地又需要使用, 只是不希望这个文件被版本控制, 可以使用
+	git rm --cached file_path
+	git commit -m 'delete remote somefile'
+	假如本地也不想要了的话
+	git rm file_path
+	git commit -m 'delete remote somefile'
+	//删除untracked 文件  慎用慎用慎用最好不要用
+	git clean -n//删除前?一眼
+	git clean -f 删掉然后本地的也会被删除
+5.版本回退
+	git reset --hard HEAD^   回退到上一个版本 ^^上两个版本   HEAD~100上100个版本   git reset --hard avbababbab编号
+5.git reflog  列出head的指向记录
+6.git checkout -- a.txt 让a.txt回到最近一次commit或者add时的状态（撤销操作工作区的文件） ，注意-- 不然就到切换分支的命令了
+7.git reset HEAD a.txt  reset 既可以回退版本也可以吧暂存区的修改退回到工作区，然后工作区的修改可以退回到提交时刻的状态
+8.删除问题
+	git rm a.txt
+	git commit 
+	不小心删了但是还没有提交ci 还可以git checkout -- a.txt 回来
+9.推送
+	关联远程库 git remote add origin xxx
+	git push -u origin master 推送master分支所有内容 -u 选择默认主机，后面推送就可以直接使用git push
+10.分支操作
+	git reflog show dev_bugfix 查看对分支的历史从无到有
+	1.创建dev分支
+		git checkout -b dev // -b 创建并切换分支相当于 git branch dev  、、 git checkout dev
+	2.查看当前分支 
+		git branch
+	3.切换分支 巴拉巴拉一顿修改想要切回主分支
+		git checkout master
+	4.把dev分支的内容合并到主分支  merge 将指定分支合并到当前分支
+		git merge dev
+	5.删除分支
+		git branch -d dev
+	6.merge 冲突
+		使用git st 查看冲突
+		打开冲突文件修改后上库ci
+	7.查看分支合并情况
+		git log --graph --pretty==oneline --abbrev-commit
+	8.fast forward合并看不出来曾经做过合并，然后使用log 可以查看到分支合并历史
+		git merge --no-ff -m "xxxxxxxx" dev
+		git log --graph --pretty==oneline --abbrev-commit
+	9.当前在dev 还没提交（做到一半还不足以提交）需要切换到master处理bug
+		git stash  可以使用git st查看干净的，把当前的工作现场保护起来的了，然后可以大胆切到其他分支去干活
+		切回来后查看刚刚的工作现场
+		git stash list
+		恢复现场但不删除stash内容，假如需要删除使用git stash drop 来删除
+		git stash apply
+		恢复现场同时删除stash内容
+		git stash pop
+		
+		假如有多个 stash 指定的恢复
+		git stash apply stash@{0}
+	10.标签，某次ci 的快照，利用tag 找ci号很容易了
+		git  branch  查看分支
+		git checkout master 切换分支
+		git tag V1.0   对当前最新的ci打标签
+		git tag v0.9  f325d322  对这个好打标签
+		git tag 查看标签
+		git show v0.9 查看这个标签信息
+		git tag -a v1.2 -m "adsfasdfas " f32e213  多写点内容
+		git tag -d v0.9  删除标签
+		推送远程标签
+		git push origi v0.9
+		git push origin --tags  一次性推送所有标签
+		想要删除远程标签
+		先删除本地-d 标签，然后  git push origin :refs/tags/v0.9

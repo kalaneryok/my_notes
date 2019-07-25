@@ -211,6 +211,10 @@ rootfs
 		cd /work/tools/gcc-3.4.5-glibc-2.3.6/arm-linux/lib     //进入源目录
 
 		cp *.so* /work/nfs_root/mini_fs/lib -d        //复制glibc库到lib目录(*:匹配符,-d:保持链接)
+		
+		我在使用orange pipc2的时候使用到aarch 可以使用readelf工具查看linuxrc文件 
+		需要这些文件系统就可以起来libc libm libresolv文件注意连接文件和实体都要考过去，
+		这些库文件中有包含了一个ld的库文件记得也要考过去不然起不来
 		6.3）修改profile
 			#可执行程序 环境变量
 		　　PATH=/bin:/sbin:/usr/bin:/usr/sbin          
