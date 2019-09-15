@@ -9,6 +9,8 @@
 		git clone https://github.com/linux-sunxi/sunxi-tools
 	3.编译详情可以看github上面的readme
 		make tools
+		失败-----zlib--------apt-get install zlib1g-dev
+		etc/profile 。bashrc里面修改path
 		sudo make install-tools 安装到/usr/local/bin目录下
 3.安装tftp服务器
 	1.有没有sudo dpkg -l tftpd-hpa)    tftp-hpa,tftpd-hpa,前面的是客户端，后面的是服务程序
@@ -35,6 +37,7 @@
 		要把tftp目录权限设置成777不然可能会出现不能上传的问题 里面的文件也是
 		在uboot下设置的serverip一定要是虚拟机下的eth0的ip，也要和ftp配置文件下一致，不能是电脑网卡的ip不然会去电脑上去找tftp服务器
 		电脑物理网卡的ip要和虚拟机下的eth0的ip不一样才能正确找到虚拟机上的ip tftp服务器。
+
 kernel
 	1.下载源码  解压  tar -xzf linux.tar.gz
 	2.make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
@@ -44,7 +47,11 @@ kernel
 	dtb文件在arch/arm64/boot/dts/相关平台的目录下
 	Image则在arm64/boot下
 
-	
+地址划分
+开发板192.168.1.123
+炫龙电脑192.168.1.16
+aklinux192.168.1.110
+
 在uboot下
 1.设置serverip  iddr
 	setenv ipaddr 192.168.5.120
@@ -321,3 +328,11 @@ initranfs
 			后面就发现之前编译的init程序就起来了
 		6.同样用上面步骤busybox创建的根文件系统打包后，uboot输入参数为rdinit=/linuxrc就行了
 				
+				
+-------------------------------------
+编译过程出现的问题
+编译kernel
+	bion问题-----sudo apt-get install bion
+	dtbs---flex--sudo apt-get install flex
+	error: openssl/bio.h: No such file or directory 
+		--sudo apt-get install libssl-dev

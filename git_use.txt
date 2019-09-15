@@ -1,4 +1,53 @@
 https://git-scm.com/book/zh/v2
+------------------------------------------------------------
+解决git clone 慢的教程
+1.windows下载
+
+方法二具体操作：
+step1 在我的电脑路径中输入：C:\Windows\System32\drivers\etc
+step2 点击hosts文件，右键属性，修改本机用户的权限，给予全部权限，保存设置
+step3 双击hosts文件，以记事本形式打开，在原始文本下一行粘贴上以下地址：
+219.76.4.4 github-cloud.s3.amazonaws.com
+也可以添加其他的地址：
+地址来源：在http://tool.chinaz.com/dns中搜索 github.global.ssl.fastly.net 和 github.com
+分别找到延迟小的地址，加入到hosts文件中即可
+保存
+step4 再次打开你要下载的github页面，点击download zip，此时发现速度飙升到3Mb/s
+————————————————
+版权声明：本文为CSDN博主「做一只AI小能手」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/qq_37285386/article/details/86569141
+2.ubuntu命令下载
+查找域名对应的ip地址，并修改hosts文件
+
+nslookup github.global.ssl.fastly.Net
+nslookup github.com 
+
+将下列内容加入 /etc/hosts文件中 就是上面查出来的内容
+
+151.101.76.249 http://global-ssl.fastly.net
+192.30.255.113 http://github.com  #此处112还是113根据自己的情况调整？
+2、刷新DNS缓存
+linux：
+
+sudo /etc/init.d/networking restart
+1
+windows：
+
+ipconfig /flushdns
+1
+mac：
+
+ sudo killall -HUP mDNSResponder
+------------------------------------------------------------
+免密码push
+之前使用的是http方式clone每次push都要输入用户名和密码
+1.到git仓库查看你的ssh地址
+2.git remote -v查看你本地的是不是http方式
+3. git remote rm origin 删除原有方式
+4.git remote add origin git地址  添加新的方式
+------------------------------------------------------------
+下载git sudo apt-get install git
+
 1.git init 创建本地仓库
 2.git config
 	git config --list  查看

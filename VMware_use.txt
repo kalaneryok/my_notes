@@ -1,3 +1,15 @@
+虚拟机安装教程
+1.http://releases.ubuntu.com/trusty
+	ubuntu iso镜像下载-----选择桌面版64位---ubuntu-14.04.6-desktop-amd64.iso
+2.打开虚拟机
+	创建虚拟机--自定义--硬件兼容性12.x，，
+	选择刚刚下载的iso
+	创建用户名和密码
+	分配虚拟磁盘40G 采用单个文件保存好
+3.启动
+使用apt-get出现Package has no installation candidate问题更新下apt-git就好了
+sudo apt-get update
+------------------------------
 1.虚拟机如何上外网
 安装汉语包
 2.安装git
@@ -87,28 +99,47 @@
 4.下载uboot的git代码编译uboot需要gcc6.0以上版本
 	1.编译发现swig没有，安装 sudo apt-get install swig
 	2.在编译发现Python.h没找到安装sudo apt-get install python-dev
-	3.在编译缺少dtc工具
+	3.在编译缺少dtc工具 sudo apt-get install device-tree-compiler
 5.安装samba
 	1.安装samba服务器。 
+	先按转vim
 	sudo apt-get install samba samba-common
 	2.添加用户(下面的AK_VMLinux是我的用户名，之后会需要设置samba的密码)。 
 	sudo smbpasswd -a AK_VMLinux
 	输入samba密码
 	3.sudo vim /etc/samba/smb.conf
-	#ak seting
-	[AKhome]
-	comment = share folder
-	browseable = yes
-	path = /home/ak/zhizuo/
-	create mask = 0700
-	directory mask = 0700
-	#valid users = AK_VMLinux
-	#force user = AK_VMLinux
-	#force group = AK_VMLinux
-	public = yes
-	available = yes
-	writable = yes
-	#ak seting
+#ak seting
+[AKhome]
+comment = share folder
+browseable = yes
+path = /home/ak/myWorkSoace/
+create mask = 0700
+directory mask = 0700
+#valid users = AK_VMLinux
+#force user = AK_VMLinux
+#force group = AK_VMLinux
+public = yes
+available = yes
+writable = yes
+#ak seting
+--------------------------不是nobody的
+#ak seting
+[AKhome]
+comment = share folder
+browseable = yes
+path = /home/ak/myWorkSoace/
+#security = user
+#guest ok =no
+public = yes
+create mask = 0777
+directory mask = 0777
+#valid users = ak
+force user = ak
+force group = ak
+#guest account =nobody_samba
+writable = yes
+#ak seting
+
 	4.重启samba服务器
 	sudo service smbd restart
 	5.在windos访问vmlinux的ip输入samba用户和密码，就能看到/home/ak/zhizuo/下的东西了
