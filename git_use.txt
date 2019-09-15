@@ -43,7 +43,7 @@ mac：
 之前使用的是http方式clone每次push都要输入用户名和密码
 1.到git仓库查看你的ssh地址
 2.git remote -v查看你本地的是不是http方式
-3. git remote rm origin 删除原有方式
+3. git remote remove origin 删除原有方式
 4.git remote add origin git地址  添加新的方式
 ------------------------------------------------------------
 下载git sudo apt-get install git
