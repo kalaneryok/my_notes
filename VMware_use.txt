@@ -21,7 +21,7 @@ sudo apt-get update
 	2.解压
 		xz -d xxx.xz  解压成tar包
 		tar xvf xxx.tar 解压
-		
+	3.将包mv到usr/local/bin 目录下解压 取bin文件里面的内容到当前目录下系统就能访问了不需要设置环境变量了
 		扩展：
 		cvf 打包一个tar
 		xvf 解开
@@ -84,6 +84,7 @@ sudo apt-get update
 		a在光标后添加
 		x删除光标位置的字符
 		hjkl左上右下
+		.bashrc
 		export PATH=/要添加的路径:$PATH
 	4.假如添加好环境变量后执行不行显示 No such file or directory
 		32位和64位机不兼容问题安装以下软件
@@ -143,6 +144,43 @@ writable = yes
 	4.重启samba服务器
 	sudo service smbd restart
 	5.在windos访问vmlinux的ip输入samba用户和密码，就能看到/home/ak/zhizuo/下的东西了
+	
+	
+7.ubuntu安装ssh
+	sudo apt-get install openssh-server
+8.安装xrdp
+	sudo apt-get install xrdp
+	使用Windows  mstsc 登入ip访问远程桌面系统
+	网上的安装vnc及xubuntu等都是第三方桌面不是ubuntu 类似曲线救国达到目的
+	这里不是
+	sudo apt-get install tightvncserver
+	需要通过xrdp连接到桌面，需要正确配置相关信息并填充到.xsession文件（针对每个用户）或/etc/startwm.sh（针对所有用户），输入如下命令
+
+	echo unity>~/.xsession
+
+	或者
+
+	sudo sed -i.bak '/fi/a #xrdp multi-users \n unity \n' /etc/xrdp/startwm.sh
+	步骤五、重启xrdp 
+
+	sudo service xrdp restart
+	步骤六、开启桌面共享功能
+	　　进入系统-》首选项-》桌面共享，或者直接搜索桌面共享，‘
+	8.2   上面这个方法 ubuntu 1604可以使用   但是1404不行用这个方法网上可行我还没试
+		sudo apt-get install xfce4
+		sudo apt-get install xrdp vnc4server
+		echo "xfce4-session" >~/.xsession
+		sudo service xrdp restart
+	
+9.安装自己的工作目录
+	mkdir myWorkSpace
+	在myWorkSpace目录下创建ziliao zhizuo tools 目录
+	mkdir ziliao zhizuo myTools myProjects
+	cd myProjects mkdir pipc2Pro
+	mkdir kernel uboot project rootfs  //这些可以不用创建 gitclone 会有目录
+10.安装vim
+	sudo apt-get install vim
+	
 6.虚拟机三种网络模式的介绍
 	https://blog.csdn.net/little_newBee/article/details/76861723
 	https://blog.csdn.net/henujyj/article/details/80019226

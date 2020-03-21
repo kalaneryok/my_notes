@@ -19,13 +19,14 @@ step4 再次打开你要下载的github页面，点击download zip，此时发现速度飙升到3Mb/s
 2.ubuntu命令下载
 查找域名对应的ip地址，并修改hosts文件
 
-nslookup github.global.ssl.fastly.Net
+nslookup github.global.ssl.fastly.net
 nslookup github.com 
 
 将下列内容加入 /etc/hosts文件中 就是上面查出来的内容
-
-151.101.76.249 http://global-ssl.fastly.net
-192.30.255.113 http://github.com  #此处112还是113根据自己的情况调整？
+67.228.102.32 http://github.global.ssl.fastly.net
+13.229.188.59 http://github.com
+69.171.228.20	github.global.ssl.fastly.net
+13.229.188.59	github.com
 2、刷新DNS缓存
 linux：
 

@@ -12,13 +12,14 @@
 		失败-----zlib--------apt-get install zlib1g-dev
 		etc/profile 。bashrc里面修改path
 		sudo make install-tools 安装到/usr/local/bin目录下
+	4.或者去百度云吧自己做的sunxi_tools_bin.tar//放到local bin 下解压
 3.安装tftp服务器
 	1.有没有sudo dpkg -l tftpd-hpa)    tftp-hpa,tftpd-hpa,前面的是客户端，后面的是服务程序
 	2.安装 
 	sudo apt-get install tftp-hpa
 	sudo apt-get install tftpd-hpa
 	2.配置服务文件 
-	vi /etc/default/tftp-hpa
+	sudo vi /etc/default/tftp-hpa
 	TFTP_USERNAME="tftp"
 	TFTP_DIRECTORY="/home/ak/zhizuo/tftpboot"
 	TFTP_ADDRESS="127.0.0.1"  这个IP地址先试用localhost测试后续真实的修改成真实的网卡地址
@@ -38,19 +39,23 @@
 		在uboot下设置的serverip一定要是虚拟机下的eth0的ip，也要和ftp配置文件下一致，不能是电脑网卡的ip不然会去电脑上去找tftp服务器
 		电脑物理网卡的ip要和虚拟机下的eth0的ip不一样才能正确找到虚拟机上的ip tftp服务器。
 
-kernel
+kernel 编译
 	1.下载源码  解压  tar -xzf linux.tar.gz
 	2.make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- defconfig
 	/bin/sh: 1: bison: not found，，安装 sudo apt-get install bison
 	/bin/sh: 1: flex: not found       sudo apt-get install flex
+	fatal error: openssl/bio.h: 没有那个文件或目录  sudo apt-get install libssl-dev	
 	3.make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- dtbs
 	dtb文件在arch/arm64/boot/dts/相关平台的目录下
 	Image则在arm64/boot下
-
+rootfs 编译
+	fatal error: alsa/asoundlib.h：没有那个文件或目录
+	sudo cp ~/myWorkSpace/myProjects/pipc2Pro/project/tools/alsa/* ./
+	
 地址划分
-开发板192.168.1.123
-炫龙电脑192.168.1.16
-aklinux192.168.1.110
+开发板192.168.5.123
+炫龙电脑192.168.5.16
+aklinux192.168.5.100
 
 在uboot下
 1.设置serverip  iddr
@@ -336,3 +341,4 @@ initranfs
 	dtbs---flex--sudo apt-get install flex
 	error: openssl/bio.h: No such file or directory 
 		--sudo apt-get install libssl-dev
+--------------------------------------
