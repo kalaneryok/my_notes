@@ -4,7 +4,7 @@
 	3.在编译缺少dtc工具 安装dtc  sudo apt-get install device-tree-compiler
 	
 	sunxi-fel -v -p spl sunxi-h5-spl32-ddr3.bin write 0x44000 bl31uboot.bin write 0x4a000000 u-boot.bin reset64 0x44000
-							指定spl文件           在0x44000 写入bl31文件            在 0x4addr中写入uboot文件  复位从44000开始执行 
+							指定spl文件           在0x44000 写入bl31文件（atf）            在 0x4addr中写入uboot文件  复位从44000开始执行 
 	sunxi-h5-spl32-ddr3.bin spl 文件固定24K大小 这个就是spl 的打印 h5只能在SRAM A1 地址运行SPL needs to be loaded at 0x10000 
 		U-Boot SPL 2018.01-00007-gdb0ecc9b42 (Feb 23 2018 - 00:55:29)
 		DRAM: 1024 MiB
@@ -23,9 +23,39 @@
 		INFO:    BL3-1: Next image address: 0x4a000000, SPSR: 0x3c9
 	u-boot-sunxi-with-spl.bin spl和uboot合在一起一般用来写到sd卡中位置都已弄好这个文件
 	u-boot.bin 原生uboot代码
-	
+	sunxi-spl.bin---32K  8K+24K的大小，已经偏移好8K的spl文件，我的uboot编译出来的spl文件不能用，
+	自己做spl文件 
+		dd if=/dev/null of=akboot bs=1k count=8
+		dd if=sunxi-h5-spl32-ddr3.bin of=akboot bs=1k count=24 seek=8   
+		dd if=u-boot.bin of=akboot bs=1k seek=32
+		sudo dd if=akboot of=/dev/sdb   写入到tf卡里
+		(. skip=blocks：从输入文件开头跳过blocks个块后再开始复制。
+		 . seek=blocks：从输出文件开头跳过blocks个块后再开始复制。)
 	尝试没有bl31阶段，在spl文件加载后传入uboot文件resetddr地址uboot也可以直接起来但reset后设备异常重复打印
 	sunxi-fel -v -p spl sunxi-h5-spl32-ddr3.bin write 0x44000 bl31uboot.bin write 0x4a000000 u-boot.bin reset64 0x44000
+	----------------------
+	uboot编译的时候会将bl32.bin编译进uboot，编译过程中报错
+	./"board/sunxi/mksunxi_fit_atf.sh" \
+	arch/arm/dts/sun50i-h5-orangepi-pc2.dtb > u-boot.its
+WARNING: BL31 file bl31.bin NOT found, resulting binary is non-functional
+Please read the section on ARM Trusted Firmware (ATF) in board/sunxi/README.sunxi64
+  MKIMAGE u-boot.itb
+			U-BOOT需要一个ARM Trusted Firmware固件。编译步骤如下：
+
+			$ git clone https://github.com/ARM-software/arm-trusted-firmware.git
+
+			$ cd arm-trusted-firmware
+
+			$ make CROSS_COMPILE=aarch64-linux-gnu- PLAT=sun50i_a64 DEBUG=1 bl31
+
+			生成的二进制文件位于build/sun50i_A64/debug/bl31.bin。将此文件复制到U-boot源目录的根目录，
+			或者将绝对文件名放入BL31环境变量，然后再从新编译U-BOOT。编译完成后SPL部分位于SPL/SUNXI-SPL.bin，
+			其余固件（包括ATF二进制文件、DTB和实际的U-boot-proper）位于u-boot.itb文件，
+			其中根目录下的u-boot-sunxi-with-spl.bin包含准备写入SD卡的二合一映像文件。
+  进bl31.bin放到uboot的更目录下啊重新编译
+  
+  
+  
 2.下载安装sunxitool工具
 	1.安装usb库
 		sudo apt-get install libusb-1.0-0-dev
