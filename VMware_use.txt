@@ -105,7 +105,7 @@ sudo apt-get update
 	1.安装samba服务器。 
 	先按转vim
 	sudo apt-get install samba samba-common
-	2.添加用户(下面的AK_VMLinux是我的用户名，之后会需要设置samba的密码)。 
+	2.添加用户(下面的AK_VMLinux是我的用户名，之后会需要设置samba的密码，必须添加linux下有的用户在添加一样名字的samba用户)。 
 	sudo smbpasswd -a AK_VMLinux
 	输入samba密码
 	3.sudo vim /etc/samba/smb.conf
